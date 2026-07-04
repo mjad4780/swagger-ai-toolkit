@@ -1,5 +1,4 @@
 
-```markdown
 # Swagger AI Toolkit
 
 **Swagger AI Toolkit** is a set of two Python scripts that automate fetching and converting Swagger/OpenAPI documentation into clean, AI‑ready Markdown.
