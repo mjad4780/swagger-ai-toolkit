@@ -1,24 +1,28 @@
 
+```markdown
 # Swagger AI Toolkit
 
-**Swagger AI Toolkit** is a set of two simple Python scripts that automate the process of fetching and converting Swagger/OpenAPI documentation into a clean, AI‑ready Markdown format.
+**Swagger AI Toolkit** is a set of two Python scripts that automate fetching and converting Swagger/OpenAPI documentation into clean, AI‑ready Markdown.
+
+---
 
 ## 🧠 The Idea
 
-When you’re working with an API that uses Swagger UI (like `https://petstore.swagger.io/`), you often need to extract the raw OpenAPI specification to feed it into an AI model for code generation. Doing this manually—either by copying the JSON or digging through the page source—is tedious and error‑prone.
+When you work with an API that uses Swagger UI (e.g., `https://your-api.com/swagger-ui/index.html`), you often need to extract the raw OpenAPI specification to feed into an AI model for code generation. Doing this manually is tedious.
 
-**This toolkit solves that problem** by providing two scripts:
+**This toolkit solves that** by providing two scripts:
 
-1.  **`swagger_fetcher.py`** – automatically downloads the `swagger.json` (OpenAPI) file from any Swagger UI URL.  
-2.  **`swagger_to_ai.py`** – converts that JSON into a structured, easy‑to‑read Markdown file.
+1. **`swagger_fetcher.py`** – automatically downloads the `swagger.json` (OpenAPI) file from any Swagger UI URL.  
+2. **`swagger_to_ai.py`** – converts that JSON into structured Markdown.
 
-The final Markdown contains **only** the essential information about your API endpoints: tags, HTTP methods, URLs, headers, request bodies, and success/error responses. It contains **no** cURL commands, no Java, and no Python code samples—just pure, structured API data that AI models like ChatGPT, Claude, and Gemini can understand perfectly.
+The output contains **only** essential endpoint information: tags, methods, URLs, headers, request bodies, and success/error responses.  
+**No** cURL, Java, Python, or JavaScript samples—just pure API structure that AI models like ChatGPT, Claude, and Gemini can understand perfectly.
 
-**Why is this useful?** Because AI models generate much better code (like Flutter/Dart models, Dio clients, or Cubit state management) when you provide them with clear, focused, and concise API documentation. This toolkit gives you exactly that.
+---
 
 ## 📦 Installation
 
-### 1. Clone or Download the Repository
+### 1. Clone or Download
 
 ```bash
 git clone https://github.com/mjad4780/swagger-ai-toolkit.git
@@ -27,142 +31,123 @@ cd swagger-ai-toolkit
 
 ### 2. Install Dependencies
 
-The only required dependency is the `requests` library. Install it using `pip`:
-
 ```bash
 pip install -r requirements.txt
 ```
 
-**📌 Important Note about `pip` installation:**  
-If you see a message like `Defaulting to user installation because normal site‑packages is not writeable`, **this is not an error**. It simply means that you are not running the command as an administrator or root user, so `pip` is installing the package in your user folder. Your scripts will work perfectly fine. You can safely ignore this message.
+> **📌 Note about `Defaulting to user installation`:**  
+> If you see this message, it’s **not an error**. It simply means you’re not running as administrator, so `pip` installs packages in your user folder. Your scripts will work fine.
+
+---
 
 ## 🚀 How to Use
 
 ### Step 1: Fetch the Swagger JSON
 
-Run the fetcher script, providing the URL of your Swagger UI page:
+Run the fetcher with **your own Swagger UI URL** (replace the placeholder):
 
 ```bash
-python swagger_fetcher.py <your_swagger_ui_url>
+python swagger_fetcher.py https://your-api-domain.com/swagger-ui/index.html
 ```
 
-For example, using the public Petstore API:
+The script tries common paths (`/v3/api-docs`, `/v2/api-docs`, `/swagger.json`, etc.) and even parses the HTML to locate the JSON.
 
-```bash
-python swagger_fetcher.py https://petstore.swagger.io/
-```
-
-The script will automatically try common paths (like `/v3/api‑docs`, `/v2/api‑docs`, `/swagger.json`, etc.) and even parse the HTML to find the correct JSON URL. On success, it saves the file as `swagger.json` in the current directory.
-
-**Additional Options:**
-
-- `-o <filename>` – specify a custom output file name (e.g., `-o my_api.json`).  
-- `-v` – enable verbose logging to see which URLs are being tried.
+**Options:**
+- `-o <filename>` – custom output file (default: `swagger.json`).
+- `-v` – verbose logging to see what URLs are attempted.
 
 ### Step 2: Convert to AI‑Ready Markdown
 
-Once you have the `swagger.json` file, run the converter:
+Now convert the JSON into Markdown:
 
 ```bash
 python swagger_to_ai.py swagger.json
 ```
 
-This will generate a file named `api_for_ai.md` (you can also specify a custom output name with `-o`).
-
-### Step 3: Use the Markdown with an AI
-
-Open the generated `api_for_ai.md` file, copy its entire content, and paste it into your preferred AI tool (ChatGPT, Claude, Gemini) with a prompt like:
-
-> *“Based on this API specification, generate Flutter/Dart models, a Dio HTTP client, a repository pattern implementation, and Cubit state management.”*
-
-## 🔍 Real‑World Example (Petstore)
-
-Let’s walk through a complete example using the public Petstore API:
+**By default**, this creates a folder named `api_docs/` containing **separate Markdown files for each API tag** (e.g., `auth.md`, `profile.md`, `orders.md`) plus an index file (`README.md`).  
+If you prefer a **single file** (legacy mode), use the `--single` flag:
 
 ```bash
-# Step 1: Fetch the JSON
-python swagger_fetcher.py https://petstore.swagger.io/
-
-# Output:
-# swagger.json is saved.
-
-# Step 2: Convert to Markdown
-python swagger_to_ai.py swagger.json
-
-# Output:
-# api_for_ai.md is created.
+python swagger_to_ai.py swagger.json --single -o api_for_ai.md
 ```
 
-Now you have a clean, AI‑friendly Markdown file ready to use.
+**Options:**
+- `--output-dir <dir>` – change the output folder (default: `api_docs`).
+- `--single` – generate one single file instead of splitting by tag.
+- `-o <file>` – specify output filename (only valid with `--single`).
+- `--verbose` – show detailed logs.
 
-## 🖼️ What the Final Markdown Looks Like
+---
 
-Here’s a short preview of the output you’ll get (formatting may vary slightly). This example shows a typical “Pet” endpoint:
+## 🖼️ What the Final Markdown Looks Like (Sample Output)
+
+Below is a shortened preview of what you’ll see in one of the generated files:
 
 ```markdown
-# API Documentation for AI
+# Auth API Endpoints
 
-## Pet
+### POST /api/auth/login
 
-### GET /pet/{petId}
-
-**Summary:** Find pet by ID  
-**Description:** Returns a single pet.
+**Summary:** User login  
+**Description:** Authenticates a user and returns a token.
 
 **Headers:**
-- api_key (header, optional): string
+- X-API-Key (header, required): string
 
 **Request Body:**
-None
+- email (required): string
+- password (required): string
 
 **Success Response:**
 Status 200:
-- id (required): integer (int64)
-- category (required): object
-  - id (required): integer (int64)
+- token (required): string
+- user (required): object
+  - id (required): integer
   - name (required): string
-- name (required): string
-- photoUrls (required): array of strings
-- tags (required): array of objects
-  - id (required): integer (int64)
-  - name (required): string
-- status (required): string (enum: available, pending, sold)
+  - email (required): string
 
 **Error Responses:**
-Status Codes: 400, 404, 500
+Status Codes: 400, 401, 500
 
 ---
 ```
 
-As you can see, it’s clean, structured, and free of unnecessary clutter—perfect for feeding into an AI.
+No extra noise—just the API structure your AI needs.
+
+---
 
 ## 📂 Project Structure
 
-| File | Description |
+| File / Folder | Description |
 | :--- | :--- |
 | `swagger_fetcher.py` | Fetches `swagger.json` from a Swagger UI URL. |
-| `swagger_to_ai.py` | Converts the JSON to an AI‑friendly Markdown file. |
-| `requirements.txt` | Lists the project dependencies (only `requests`). |
-| `swagger.json` | The downloaded OpenAPI specification (generated in Step 1). |
-| `api_for_ai.md` | The final Markdown output (generated in Step 2). |
+| `swagger_to_ai.py` | Converts JSON to Markdown (split by tag by default). |
+| `requirements.txt` | Only dependency: `requests`. |
+| `swagger.json` | Downloaded OpenAPI spec (generated in Step 1). |
+| `api_docs/` | Output folder (generated in Step 2) with per‑tag `.md` files and an index. |
+
+---
 
 ## ⚠️ Important Notes
 
-- **Circular References (`$ref`):** The converter automatically detects and handles recursive references (e.g., `User -> Order -> User`) to prevent infinite loops and crashes.  
-- **If Fetching Fails:** Run the fetcher with the `-v` flag to see detailed logs of which URLs were attempted. Alternatively, open the Swagger UI page in your browser, press `F12` to open Developer Tools, go to the `Network` tab, refresh the page, and look for a request ending in `.json`. Copy that direct URL and use it with the fetcher.  
-- **Python Version:** Requires **Python 3.7 or later** due to the use of modern type hints. If you have an older version, please upgrade or remove the type hints from the scripts.  
-- **Privacy:** Everything runs locally on your machine. No data is sent to any external server.
+- **Circular References (`$ref`):** The converter automatically detects and stops recursive references (`User -> Order -> User`) to prevent crashes.
+- **If Fetching Fails:** Use `-v` to see which URLs are tried. Alternatively, open the Swagger UI, press `F12` → `Network`, refresh, and look for a `.json` request. Copy that direct URL and pass it to the fetcher.
+- **Python Version:** Requires **Python 3.7+** due to modern type hints. Upgrade if needed.
+- **Privacy:** Everything runs locally—no data is sent anywhere.
 
+---
 
 ## 🤝 Contributing
 
-Contributions are welcome! Feel free to open an issue or submit a pull request.
+Contributions are welcome! Feel free to open issues or pull requests.
 
 ## 📄 License
 
-This project is licensed under the MIT License.
+MIT – free to use, modify, and distribute.
 
 ---
 
 Happy coding! 🚀
 ```
+
+---
